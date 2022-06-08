@@ -63,28 +63,72 @@ class VacanciesProcessor:
                 self.vacancies['results'].append(dictionary)
 
             browser.close()
+            print('Collected all links. Processing...')
 
-    async def download_single_description(self, job: dict) -> dict:
+    async def get_djinni_vacancies(self, technology: str, banned_list: list) -> None:
+        vacancies_link = 'https://djinni.co/jobs/keyword-{}/'.format(technology.lower())
+
+        async def process_one_page(url: str) -> None:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers={'User-Agent': 'Mozilla/5.0'}) as response:
+                    html_code = await response.read()
+                    soup = BeautifulSoup(html_code, features='html.parser')
+
+                    for link in soup.findAll('a', class_='profile'):
+                        quality_link = True
+
+                        for banned_keyword in banned_list:
+                            if banned_keyword in link.text:
+                                quality_link = False
+                                break
+
+                        if not quality_link:
+                            continue
+
+                        dictionary = dict()
+                        dictionary['job_title'] = link.text
+                        dictionary['link'] = 'https://djinni.co{}'.format(link.get('href'))
+                        self.vacancies['results'].append(dictionary)
+
+        first_response = str(urlopen(vacancies_link).read(), 'utf-8')
+        soup = BeautifulSoup(first_response, features='html.parser')
+        search = soup.findAll('a', class_='page-link')
+        max_page = int(max([link.getText() for link in search]))
+
+        links_list = [vacancies_link + '?page={}'.format(num) for num in range(2, max_page)]
+
+        coroutines = []
+
+        for link in links_list:
+            coroutine = process_one_page(link)
+            coroutines.append(coroutine)
+
+        await gather_with_concurrency(15, *coroutines)
+        print('Collected all links. Processing...')
+
+    async def download_description(self, source: str, job: dict) -> dict:
         async with aiohttp.ClientSession() as session:
             url = job.get('link')
             async with session.get(url, headers={'User-Agent': 'Mozilla/5.0'}) as response:
                 html_code = await response.read()
                 soup = BeautifulSoup(html_code, features='html.parser')
                 try:
-                    job['description'] = soup.find('div', class_='vacancy-section').text
+                    if source.lower() == 'dou':
+                        job['description'] = soup.find('div', class_='vacancy-section').text
+                    elif source.lower() == 'djinni':
+                        job['description'] = soup.find('div', class_='row-mobile-order-2').text
                 except:
                     print('Error with', url)
                 return job
 
-    async def download_dou_descriptions(self) -> None:
-        print('Collected all links. Processing...')
+    async def download_all_descriptions(self, source: str) -> None:
+
         print('Downloading all job descriptions...')
 
-        start = time.time()
         coroutines = []
 
         for job in self.vacancies.get('results'):
-            coroutine = self.download_single_description(job)
+            coroutine = self.download_description(source=source, job=job)
             coroutines.append(coroutine)
 
         await gather_with_concurrency(15, *coroutines)

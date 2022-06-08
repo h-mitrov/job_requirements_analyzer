@@ -1,0 +1,6 @@
+.idea
+.venv
+test.py
+raw_technologies_source.txt
+relevant_jobs.json
+results.json
