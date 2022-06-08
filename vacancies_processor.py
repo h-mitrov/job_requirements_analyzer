@@ -47,7 +47,7 @@ class VacanciesProcessor:
         :param banned_list: A list of unwanted keywords you want to exclude from search.
         :return: None. Vacancies are automatically stored in the 'vacancies' object attribute.
         """
-        vacancies_link = 'https://jobs.dou.ua/vacancies/?category={}'.format(technology)
+        vacancies_link = 'https://jobs.dou.ua/vacancies/?category={}'.format(technology.lower())
 
         with sync_playwright() as play:
             print('Opening browser...')
@@ -56,16 +56,18 @@ class VacanciesProcessor:
             page.goto(vacancies_link)
 
             more_button = page.locator('text=Більше вакансій')
-            more_button_exists = True
 
-            while more_button_exists:
-                more_button.click()
-                print('Clicked "More vacancies" button to load more entries')
+            while True:
+                if more_button.is_visible():
+                    more_button.click()
+                    print('Clicked "More vacancies" button to load more entries')
+                else:
+                    break
                 time.sleep(0.5)
-                more_button_exists = more_button.is_visible()
 
             page_content = page.content()
 
+            print('Parsing vacancies...')
             soup = BeautifulSoup(page_content, features='html.parser')
 
             for link in soup.findAll('a', class_='vt'):
