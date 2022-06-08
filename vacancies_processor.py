@@ -3,7 +3,8 @@ import re
 import json
 import time
 import asyncio
-from urllib.request import urlopen, Request
+from urllib.request import urlopen
+
 
 # third party imports
 import aiohttp
@@ -11,7 +12,14 @@ from bs4 import BeautifulSoup
 from playwright.sync_api import sync_playwright
 
 
-async def gather_with_concurrency(n, *tasks):
+async def gather_with_concurrency(n: int, *tasks: list):
+    """
+    This function helps to limit the number of simultaneous requests to Dou.ua or Djinni.co websites.
+
+    :param n: Integer. The limit of simultaneous tasks.
+    :param tasks: List. A list of coroutines that need to be executed.
+    :return: It returns the result of coroutines execution.
+    """
     semaphore = asyncio.Semaphore(n)
 
     async def sem_task(task):
@@ -21,10 +29,24 @@ async def gather_with_concurrency(n, *tasks):
 
 
 class VacanciesProcessor:
+    """
+    Class that makes all the heavy lifting: parses the jobs, descriptions,
+    analyzes skills popularity, etc.
+
+    — 'vacancies' attribute stores a list of all jobs.
+    — 'skills_rating' is an attribute that stores the skills rating.
+    """
     vacancies = {'results': []}
     skills_rating = {'skills': []}
 
     def get_dou_vacancies(self, technology: str, banned_list: list) -> None:
+        """
+        This method parses relevant vacancies from Dou.ua. But not their descriptions.
+
+        :param technology: Can be 'Python', 'Java', etc. But tested only with 'Python'.
+        :param banned_list: A list of unwanted keywords you want to exclude from search.
+        :return: None. Vacancies are automatically stored in the 'vacancies' object attribute.
+        """
         vacancies_link = 'https://jobs.dou.ua/vacancies/?category={}'.format(technology)
 
         with sync_playwright() as play:
@@ -66,9 +88,22 @@ class VacanciesProcessor:
             print('Collected all links. Processing...')
 
     async def get_djinni_vacancies(self, technology: str, banned_list: list) -> None:
+        """
+        This method parses relevant vacancies from Djinni.co. But not their descriptions.
+
+        :param technology: Can be 'Python', 'Java', etc. But tested only with 'Python'.
+        :param banned_list: A list of unwanted keywords you want to exclude from search.
+        :return: None. Vacancies are automatically stored in the 'vacancies' object attribute.
+        """
         vacancies_link = 'https://djinni.co/jobs/keyword-{}/'.format(technology.lower())
 
         async def process_one_page(url: str) -> None:
+            """
+            Processes a single search page once given an url.
+
+            :param url: Link to Dou.ua or Djinni.co vacancy.
+            :return: None. Vacancies are automatically stored in the 'vacancies' object attribute.
+            """
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers={'User-Agent': 'Mozilla/5.0'}) as response:
                     html_code = await response.read()
@@ -109,6 +144,14 @@ class VacanciesProcessor:
         print('Collected all links. Processing...')
 
     async def download_description(self, source: str, job: dict) -> dict:
+        """
+        This method adds a description to a certain vacancy (Dou.ua or Djinni.co).
+        It updates the object's 'vacancies' attribute.
+
+        :param source: String. Can be only 'Dou' or 'Djinni'.
+        :param job: String. Can be only 'Python' or 'Java', etc. But tested only with 'Python'.
+        :return: Dictionary. Adds 'description' key and its value.
+        """
         async with aiohttp.ClientSession() as session:
             url = job.get('link')
             async with session.get(url, headers={'User-Agent': 'Mozilla/5.0'}) as response:
@@ -124,7 +167,13 @@ class VacanciesProcessor:
                 return job
 
     async def download_all_descriptions(self, source: str) -> None:
+        """
+        This method downloads job descriptions for every job in the 'vacancies' attribute.
+        And saves a JSON file with all vacancies.
 
+        :param source: String. Can be only 'Dou' or 'Djinni'.
+        :return: None. Vacancies are automatically updated in the 'vacancies' object attribute.
+        """
         print('Downloading all job descriptions...')
 
         coroutines = []
@@ -140,6 +189,13 @@ class VacanciesProcessor:
             json.dump(self.vacancies, relevant_jobs, indent=4)
 
     def analyze_vacancies(self, tech_stack: set) -> None:
+        """
+        This method analyzes all skills, checking for matches in the vacancies' descriptions.
+
+        :param tech_stack: Set. A set of skills that we are looking for.
+        :return: None. The result is automatically stored in a JSON file.
+        """
+
         jobs_quantity = len(self.vacancies.get('results'))
 
         print('Analyzing tech skills frequency...')

@@ -5,6 +5,10 @@ from urllib.request import urlopen
 
 
 def create_skills_list() -> set:
+    """
+    Creates a set of more than 700 frameworks, technologies, etc. from https://github.com/vinta/awesome-python.
+    :return: set
+    """
     source_link = 'https://raw.githubusercontent.com/vinta/awesome-python/master/README.md'
     skills_list = {'SQL',
                   'NoSQL'
