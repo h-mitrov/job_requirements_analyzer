@@ -90,6 +90,8 @@ class VacanciesProcessor:
                         dictionary['link'] = 'https://djinni.co{}'.format(link.get('href'))
                         self.vacancies['results'].append(dictionary)
 
+        print('Launching Djinni parser...')
+
         first_response = str(urlopen(vacancies_link).read(), 'utf-8')
         soup = BeautifulSoup(first_response, features='html.parser')
         search = soup.findAll('a', class_='page-link')
