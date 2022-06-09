@@ -57,7 +57,7 @@ Type the following command to your terminal:
     pip install -r requirements.txt              
 ```
 
-4. Run the application.
+4. Go to the main.py and run the application.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
