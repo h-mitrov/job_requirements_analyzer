@@ -3,7 +3,7 @@
 This app helps you find out, what skills are most essential for Junior or Middle Python Developer. You get a JSON file with skills ranked by popularity.
 
 It parses data from [Dou.ua](https://jobs.dou.ua/) and [Djinni.co](https://djinni.co/jobs/) and checks every relevant job description to find
-mentions of more than 700 technologies, languages and libraries (for full list check [custom_skills.py](https://github.com/vinta/awesome-python)
+mentions of more than 700 technologies, languages and libraries (for full list check [custom_skills.py](https://github.com/h-mitrov/job_requirements_analyzer/blob/master/custom_skills.py)
 and [awesome-python](https://github.com/vinta/awesome-python)
 repo).
 
