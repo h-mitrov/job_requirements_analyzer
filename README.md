@@ -9,6 +9,13 @@ repo).
 
 Any feedback or advise would be really appreciated — I am on my way on becoming a Python developer, so I'd really love to learn from experienced colleagues everything I can.
 
+## Instruments and libraries used
+- [Playwright](https://playwright.dev/python/) — a web browser for working with dynamic web pages.
+- [beautifulsoup4](https://pypi.org/project/beautifulsoup4/) — for getting data from pages.
+- [aiohttp](https://docs.aiohttp.org/en/stable/) — for asynchronous web requests.
+- [asyncio](https://docs.python.org/3/library/asyncio.html) — for running asynchronous requests.
+- [re](https://docs.python.org/3/library/re.html) — for text searching.
+
 ## Results
 As of 8th of Jun, 2022, after analyzing 100 jobs on Dou.ua and about 500 jobs on Djinni.co, main skills and technologies for Python Developer
 are:
