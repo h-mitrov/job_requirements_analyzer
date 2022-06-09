@@ -34,7 +34,10 @@ are:
 20. Pytorch
 
 No data on QA, AQA, Seniors, Team Leads, DevOps or other jobs was analyzed. This statistics is true only for Middle or Junior
-Python Developers.
+Python Developers. But you can make changes to the 'black_list' in  [main.py](https://github.com/h-mitrov/job_requirements_analyzer/blob/master/main.py) 
+and run your own search. In this case, make sure to update the [custom_skills.py](https://github.com/h-mitrov/job_requirements_analyzer/blob/master/custom_skills.py)
+as well (otherwise, the app won't know what to look for).
+
 
 ## How to run it locally
 To run this app locally, stick to the following guide:
