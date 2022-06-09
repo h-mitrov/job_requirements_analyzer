@@ -3,6 +3,9 @@ import os
 import re
 from urllib.request import urlopen
 
+# local app imports
+from custom_skills import skills_list
+
 
 def create_skills_list() -> set:
     """
@@ -10,52 +13,6 @@ def create_skills_list() -> set:
     :return: set
     """
     source_link = 'https://raw.githubusercontent.com/vinta/awesome-python/master/README.md'
-    skills_list = {'SQL',
-                  'NoSQL'
-                  'Git',
-                  'Bash',
-                  'Django',
-                  'Flask',
-                  'FastAPI',
-                  'PostgreSQL',
-                  'Docker',
-                  'Linux',
-                  'REST API',
-                  'SQL',
-                  'Redis',
-                  'JSON',
-                  'JavaScript',
-                  'Celery',
-                  'MySQL',
-                  'Django',
-                  'Rest Framework',
-                  'AWS',
-                  'Jira',
-                  'API',
-                  'REST',
-                  'HTML',
-                  'CSS',
-                  'JavaScript',
-                  'asyncio',
-                  'OOP',
-                  'scraping',
-                  'regex',
-                  'React',
-                  'Angular',
-                  'Node.js',
-                  'Unix',
-                  'Heroku',
-                  'Odoo',
-                  'Azure',
-                  'PEP',
-                  'SQLAlchemy',
-                  'nginx',
-                  'SQLite',
-                  'PostgreSQL',
-                  'TCP',
-                  'Kafka',
-                  'Pytest'
-                  }
 
     # checking if we already downloaded the up-to-date technologies source file
     if not os.path.exists('raw_technologies_source.txt'):
